@@ -1,0 +1,176 @@
+version: 1.0.0
+client:
+
+ organization: Org1
+ logging:
+  level: info
+
+ cryptoconfig:
+  path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config
+
+ credentialStore:
+  path: "/tmp/state-store"
+
+  cryptoStore:
+   path: /tmp/msp
+
+ BCCSP:
+  security:
+   enabled: true
+   default:
+    provider: "SW"
+   x509PluginType: "std"
+   library: "std"
+   hashAlgorithm: "SHA2"
+   softVerify: true
+   level: 256
+
+ tlsCerts:
+  systemCertPool: true
+  client:
+   key:
+    path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/client.key
+   cert:
+    path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/tls/client.crt
+
+channels:
+ mychannel:
+  peers:
+   peer0.org1.example.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+   peer1.org1.example.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+   peer0.org2.example.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+   peer1.org2.example.com:
+    endorsingPeer: true
+    chaincodeQuery: true
+    ledgerQuery: true
+    eventSource: true
+
+#
+# list of participating organizations in this network
+#
+organizations:
+ Org1:
+  mspid: Org1MSP
+  cryptoPath: /home/centos/gopath/src/stu_sdk/Org1/Org1/{username}/msp
+  peers:
+   - peer0.org1.example.com
+   - peer1.org1.example.com
+
+ Org2:
+  mspid: Org2MSP
+  cryptoPath:  /home/centos/gopath/src/github.com/fabric-sdk-demo/baas1/users/{username}/msp
+  peers:
+   - peer0.org2.example.com
+   - peer1.org2.example.com
+
+orderers:
+ orderer.example.com:
+  url: grpcs://localhost:7050
+  grpcOptions:
+   ssl-target-name-override: orderer.example.com
+   keep-alive-time: 0s
+   keep-alive-timeout: 20s
+   keep-alive-permit: false
+   fail-fast: false
+   allow-insecure: false
+  tlsCACerts:
+   path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
+
+peers:
+ peer0.org1.example.com:
+  url: grpcs://localhost:7051
+
+  grpcOptions:
+   ssl-target-name-override: peer0.org1.example.com
+   keep-alive-time: 0s
+   keep-alive-timeout: 20s
+   keep-alive-permit: false
+   fail-fast: false
+   allow-insecure: false
+
+  tlsCACerts:
+   path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
+
+ peer1.org1.example.com:
+  url: grpcs://localhost:8051
+
+  grpcOptions:
+   ssl-target-name-override: peer1.org1.example.com
+   keep-alive-time: 0s
+   keep-alive-timeout: 20s
+   keep-alive-permit: false
+   fail-fast: false
+   allow-insecure: false
+
+  tlsCACerts:
+   path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org1.example.com/tlsca/tlsca.org1.example.com-cert.pem
+
+ peer0.org2.example.com:
+  url: grpcs://localhost:9051
+
+  grpcOptions:
+   ssl-target-name-override: peer0.org2.example.com
+   keep-alive-time: 0s
+   keep-alive-timeout: 20s
+   keep-alive-permit: false
+   fail-fast: false
+   allow-insecure: false
+
+  tlsCACerts:
+   path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem
+
+ peer1.org2.example.com:
+  url: grpcs://localhost:10051
+
+  grpcOptions:
+   ssl-target-name-override: peer1.org2.example.com
+   keep-alive-time: 0s
+   keep-alive-timeout: 20s
+   keep-alive-permit: false
+   fail-fast: false
+   allow-insecure: false
+
+  tlsCACerts:
+   path: /home/centos/gopath/src/github.com/hyperledger/fabric/fabric-samples/first-network/crypto-config/peerOrganizations/org2.example.com/tlsca/tlsca.org2.example.com-cert.pem
+# pattern:peer0.org1.example.com 这里指的是节点的名字
+# grpcs://localhost:7051 本地运行（不在docker及k8s）:localhost
+# grpcs://peer-0-ccdc.ccdc:7051 (运行在k8s) peer-0-ccdc.ccdc 节点名字.域名
+entitymatchers:
+ peer:
+  - pattern: (\w*)peer0.org1.example.com(\w*)
+    urlsubstitutionexp: grpcs://localhost:7051
+    ssltargetoverrideurlsubstitutionexp: peer0.org1.example.com
+    mappedhost: peer0.org1.example.com
+
+  - pattern: (\w*)peer1.org1.example.com(\w*)
+    urlsubstitutionexp: grpcs://localhost:8051
+    ssltargetoverrideurlsubstitutionexp: peer1.org1.example.com
+    mappedhost: peer1.org1.example.com
+
+  - pattern: (\w*)peer0.org2.example.com(\w*)
+    urlsubstitutionexp: grpcs://localhost:9051
+    ssltargetoverrideurlsubstitutionexp: peer0.org2.example.com
+    mappedhost: peer0.org2.example.com
+
+  - pattern: (\w*)peer1.org2.example.com(\w*)
+    urlsubstitutionexp: grpcs://localhost:10051
+    ssltargetoverrideurlsubstitutionexp: peer1.org2.example.com
+    mappedhost: peer1.org2.example.com
+
+ orderer:
+  - pattern: (\w*)orderer.example.com(\w*)
+    urlsubstitutionexp: localhost:7050
+    ssltargetoverrideurlsubstitutionexp: orderer.example.com
+    mappedhost: orderer.example.com
